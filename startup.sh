@@ -4,7 +4,7 @@ touch /odtp/odtp-logs/log.txt
 touch /odtp/odtp-logs/odtpLoggerDebugging.txt
 touch /odtp/odtp-logs/odtpS3UploadedDebugging.txt 
 
-bash /odtp/odtp-client/odtp-app.sh 2>&1 | tee /odtp/odtp-logs/log.txt
+bash /odtp/odtp-component-client/odtp-app.sh 2>&1 | tee /odtp/odtp-logs/log.txt
 
 echo "--- ODTP COMPONENT ENDING ---" >> /odtp/odtp-logs/log.txt
 
