@@ -13,7 +13,7 @@ def readTemplate(templatefile):
 def replaceListParameters(content, listPlaceholders, parameterValue):
 
     for p, v in zip(listPlaceholders, parameterValue):
-            content = content.replace(f"[{p}]", v)
+            content = content.replace(f"{{{{{p}}}}}", v)
 
     return content
 
@@ -33,7 +33,7 @@ def readODTPConfigYAML(configfile):
 def obtainAllPlaceholders(filepath):
     template = readTemplate(filepath)
 
-    pattern = r'\[([^[\]]+)\]'
+    pattern = r'\{\{([^{}]+)\}\}'
 
     # Find all placeholders in the template
     placeholders = re.findall(pattern, template)
