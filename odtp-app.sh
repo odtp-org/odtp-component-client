@@ -10,7 +10,7 @@ sleep 2
 ## ODTP LOGGER in the background
 if [ -v ODTP_MONGO_SERVER ]; then
     echo "STARTING LOGGING IN MONGO SERVER"
-    python3 /odtp/odtp-client/logger.py >> /odtp/odtp-logs/odtpLoggerDebugging.txt 2>&1 &
+    python3 /odtp/odtp-component-client/logger.py >> /odtp/odtp-logs/odtpLoggerDebugging.txt 2>&1 &
 else
     echo "ODTP_MONGO_SERVER does not exist"
 fi
@@ -49,7 +49,7 @@ mv ../odtp-snapshot.zip odtp-snapshot.zip
 
 if [[ -v ODTP_S3_SERVER && -v ODTP_MONGO_SERVER ]]; then
     echo "Uploading to ODTP_S3_SERVER"
-    python3 /odtp/odtp-client/s3uploader.py 2>&1 | tee /odtp/odtp-logs/odtpS3UploadedDebugging.txt  
+    python3 /odtp/odtp-component-client/s3uploader.py 2>&1 | tee /odtp/odtp-logs/odtpS3UploadedDebugging.txt  
 else
     echo "ODTP_S3_SERVER does not exist"
 fi
