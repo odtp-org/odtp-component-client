@@ -27,6 +27,15 @@ bash /odtp/odtp-app/app.sh
 ############################################################################################
 
 #########################################################
+# TRANSFERRING INPUT TO OUTPUT 
+#########################################################
+
+if [ "$TRANSFER_INPUT_TO_OUTPUT" == "TRUE" ]; then
+    echo "COPYING INPUT FILES TO OUTPUT"
+    cp -r /odtp/odtp-input/* /odtp/odtp-output
+fi
+
+#########################################################
 # COMPRESS THE OUTPUT FOLDER GENERATED
 #########################################################
 
