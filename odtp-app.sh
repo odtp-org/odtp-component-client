@@ -49,9 +49,11 @@ mv ../odtp-output.zip odtp-output.zip
 #########################################################
 
 # Take snapshot of workdir
-cd /odtp/odtp-workdir
-zip -r ../odtp-snapshot.zip *
-mv ../odtp-snapshot.zip odtp-snapshot.zip
+if [ "ODTP_SAVE_SNAPSHOT" == "TRUE" ]; then
+    cd /odtp/odtp-workdir
+    zip -r ../odtp-snapshot.zip *
+    mv ../odtp-snapshot.zip odtp-snapshot.zip
+fi
 
 
 ## Saving Snapshot in s3

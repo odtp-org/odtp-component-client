@@ -2,6 +2,12 @@
 
 Client for ODTP Components. This repository is aimed to be used as a submodule in the different components repositories. 
 
+## Changelog
+
+- v0.0.1
+    - First version
+    - Inluding conditional to make snapshot optionals
+
 # Acknowledgments, Copyright, and Licensing
 ## Acknowledgments and Funding
 This work is part of the broader project **O**pen **D**igital **T**win **P**latform of the **S**wiss **M**obility **S**ystem (ODTP-SMS) funded by Swissuniversities CHORD grant Track B - Establish Projects. ODTP-SMS project is a joint endeavour by the Center for Sustainable Future Mobility - CSFM (ETH Zürich) and the Swiss Data Science Center - SDSC (EPFL and ETH Zürich). 
