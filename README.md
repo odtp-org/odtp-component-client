@@ -7,6 +7,7 @@ Client for ODTP Components. This repository is aimed to be used as a submodule i
 - v0.0.1
     - First version
     - Inluding conditional to make snapshot optionals
+    - Adding quiet flag to compressing
 
 # Acknowledgments, Copyright, and Licensing
 ## Acknowledgments and Funding
