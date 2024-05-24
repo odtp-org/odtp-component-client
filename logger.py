@@ -125,6 +125,13 @@ class MongoManager:
             {"$push": {"output": output_id}},
             {"$set": {"updated_at": datetime.now(timezone.utc)}}
         )
+
+    def update_end_time(self, step_id):
+        steps_collection = self.db["steps"]
+        steps_collection.update_one(
+            {"_id": ObjectId(step_id)},
+            {"$set": {"end_timestamp": datetime.now(timezone.utc)}}
+        )
     
     ######### Get methods
 
@@ -283,6 +290,10 @@ def main(delay=2):
 
         # TODO: Improve this
         if log == "--- ODTP COMPONENT ENDING ---":
+            dbManager = MongoManager(MONGO_URL, db_name)
+            dbManager.update_end_time(step_id)
+            dbManager.close()
+            
             ending_detected = True
 
         #time.sleep(delay)
