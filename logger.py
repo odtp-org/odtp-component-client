@@ -108,22 +108,15 @@ class MongoManager:
             {"_id": ObjectId(step_id)},
             {"$push": {"logs": {"$each": log_data_list}}}
         )
-
-    def add_result(self, digital_twin_id, execution_id, result_data):
-        results_collection = self.db["results"]
-        result_data["digitalTwinRef"] = digital_twin_id
-        result_data["executionRed"] = execution_id
-        
-        result_id = results_collection.insert_one(result_data).inserted_id
-
-        return result_id
     
     def update_result(self, result_id, output_id):
         results_collection = self.db["results"]
         results_collection.update_one(
             {"_id": ObjectId(result_id)},
-            {"$push": {"output": output_id}},
-            {"$set": {"updated_at": datetime.now(timezone.utc)}}
+            {
+                "$push": {"output": output_id},
+                "$set": {"updated_at": datetime.now(timezone.utc)}
+            }
         )
 
     def update_end_time(self, step_id):
