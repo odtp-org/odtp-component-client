@@ -190,6 +190,9 @@ def main():
     }
 
     odtp_output_id = dbManager.add_output(STEP_ID, output_data)
+
+    if os.getenv("ODTP_SAVE_IN_RESULT") == "TRUE":
+        dbManager.update_result(STEP_ID, os.environ("ODTP_RESULT"), odtp_output_id)
     
     logging.info("ODTP OUTPUT UPLOADED IN {}".format(odtp_output_id))
 

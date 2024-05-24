@@ -118,6 +118,14 @@ class MongoManager:
 
         return result_id
     
+    def update_result(self, result_id, output_id):
+        results_collection = self.db["results"]
+        results_collection.update_one(
+            {"_id": ObjectId(result_id)},
+            {"$push": {"output": output_id}}
+            {"$set": {"updated_at": datetime.now(datetime.UTC)}}
+        )
+    
     ######### Get methods
 
     def get_all_collections_as_dict(self):
