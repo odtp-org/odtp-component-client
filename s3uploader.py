@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import time
 import logging
@@ -176,8 +176,8 @@ def main():
         "file_name": "odtp-output.zip",  # The name of the file in the output
         "file_size": file_size_bytes,  # Size of the file in bytes
         "file_type": "application/zip",  # MIME type or file type
-        "created_at": datetime.utcnow(),  # Timestamp when the output was created
-        "updated_at": datetime.utcnow(),  # Timestamp when the output was last updated
+        "created_at": datetime.now(timezone.utc),  # Timestamp when the output was created
+        "updated_at": datetime.now(timezone.utc),  # Timestamp when the output was last updated
         "metadata": {  # Additional metadata associated with the output
             "description": "Description of the snapshot",
             "tags": ["tag1", "tag2"],
@@ -212,8 +212,8 @@ def main():
             "file_name": "odtp-snapshot.zip",  # The name of the file in the output
             "file_size": file_size_bytes,  # Size of the file in bytes
             "file_type": "application/zip",  # MIME type or file type
-            "created_at": datetime.utcnow(),  # Timestamp when the output was created
-            "updated_at": datetime.utcnow(),  # Timestamp when the output was last updated
+            "created_at": datetime.now(timezone.utc),  # Timestamp when the output was created
+            "updated_at": datetime.now(timezone.utc),  # Timestamp when the output was last updated
             "metadata": {  # Additional metadata associated with the output
                 "description": "Description of the snapshot",
                 "tags": ["tag1", "tag2"],

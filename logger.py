@@ -2,7 +2,7 @@
 
 from pymongo import MongoClient, errors
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import time
 import json
@@ -122,8 +122,8 @@ class MongoManager:
         results_collection = self.db["results"]
         results_collection.update_one(
             {"_id": ObjectId(result_id)},
-            {"$push": {"output": output_id}}
-            {"$set": {"updated_at": datetime.now(datetime.UTC)}}
+            {"$push": {"output": output_id}},
+            {"$set": {"updated_at": datetime.now(timezone.utc)}}
         )
     
     ######### Get methods
