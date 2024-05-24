@@ -275,7 +275,7 @@ def main(delay=2):
         newLogList = []
         for log in logs:
             newLogEntry= {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "type": "INFO",
             "logstring": log}
 
@@ -293,7 +293,7 @@ def main(delay=2):
             dbManager = MongoManager(MONGO_URL, db_name)
             dbManager.update_end_time(step_id)
             dbManager.close()
-            
+
             ending_detected = True
 
         #time.sleep(delay)
