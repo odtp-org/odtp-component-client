@@ -46,6 +46,13 @@ class MongoManager:
         )
 
         return digital_twin_id
+    
+    def add_logs(self, log_data_list):
+        logs_collection = self.db["logs"]
+
+        log_ids = logs_collection.insert_many(log_data_list).inserted_ids
+
+        return log_ids
 
 
     def append_execution(self, digital_twin_id, execution_data):
@@ -270,15 +277,16 @@ def main(delay=2):
         newLogList = []
         for log in logs:
             newLogEntry= {
+            "stepRef": step_id,
             "timestamp": datetime.now(timezone.utc),
-            "type": "INFO",
             "logstring": log}
 
             newLogList.append(newLogEntry)
 
 
         dbManager = MongoManager(MONGO_URL, db_name)
-        _ = dbManager.append_logs(step_id, newLogList)
+        # _ = dbManager.append_logs(step_id, newLogList)
+        _ = dbManager.add_logs(newLogList)
         dbManager.close()
 
         time.sleep(0.2)
