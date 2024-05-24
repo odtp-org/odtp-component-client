@@ -113,10 +113,12 @@ class MongoManager:
         results_collection = self.db["results"]
         results_collection.update_one(
             {"_id": ObjectId(result_id)},
-            {
-                "$push": {"output": output_id},
-                "$set": {"updated_at": datetime.now(timezone.utc)}
-            }
+            {"$push": {"output": output_id}}
+        )
+
+        results_collection.update_one(
+            {"_id": ObjectId(result_id)},
+            "$set": {"updated_at": datetime.now(timezone.utc)}
         )
 
     def update_end_time(self, step_id):
