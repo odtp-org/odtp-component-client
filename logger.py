@@ -78,18 +78,18 @@ class MongoManager:
         return step_id
     
     def add_output(self, step_id, output_data):
-        steps_collection = self.db["outputs"]
+        output_collection = self.db["outputs"]
         output_data["stepRef"] = step_id
 
         # TODO: Make its own function. Taking out user_id
         #output_data["access_control"]["authorized_users"] = user_id
 
-        output_id = steps_collection.insert_one(output_data).inserted_id
+        output_id = output_collection.insert_one(output_data).inserted_id
 
-        # Update digital twin with execution reference
-        self.db.digitalTwins.update_one(
+        # Update steps with execution reference
+        self.db.steps.update_one(
             {"_id": ObjectId(step_id)},  # Specify the document to update
-            {"$set": {"field_name": output_id}}  # Use $set to replace the value of a field
+            {"$set": {"output": output_id}}  # Use $set to replace the value of a field
         )
 
         return output_id
