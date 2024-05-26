@@ -2,7 +2,7 @@
 
 from pymongo import MongoClient, errors
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import time
 import json
@@ -46,6 +46,13 @@ class MongoManager:
         )
 
         return digital_twin_id
+    
+    def add_logs(self, log_data_list):
+        logs_collection = self.db["logs"]
+
+        log_ids = logs_collection.insert_many(log_data_list).inserted_ids
+
+        return log_ids
 
 
     def append_execution(self, digital_twin_id, execution_data):
@@ -78,18 +85,18 @@ class MongoManager:
         return step_id
     
     def add_output(self, step_id, output_data):
-        steps_collection = self.db["outputs"]
+        output_collection = self.db["outputs"]
         output_data["stepRef"] = step_id
 
         # TODO: Make its own function. Taking out user_id
         #output_data["access_control"]["authorized_users"] = user_id
 
-        output_id = steps_collection.insert_one(output_data).inserted_id
+        output_id = output_collection.insert_one(output_data).inserted_id
 
-        # Update digital twin with execution reference
-        self.db.digitalTwins.update_one(
+        # Update steps with execution reference
+        self.db.steps.update_one(
             {"_id": ObjectId(step_id)},  # Specify the document to update
-            {"$set": {"field_name": output_id}}  # Use $set to replace the value of a field
+            {"$set": {"output": output_id}}  # Use $set to replace the value of a field
         )
 
         return output_id
@@ -108,15 +115,25 @@ class MongoManager:
             {"_id": ObjectId(step_id)},
             {"$push": {"logs": {"$each": log_data_list}}}
         )
-
-    def add_result(self, digital_twin_id, execution_id, result_data):
+    
+    def update_result(self, result_id, output_id):
         results_collection = self.db["results"]
-        result_data["digitalTwinRef"] = digital_twin_id
-        result_data["executionRed"] = execution_id
-        
-        result_id = results_collection.insert_one(result_data).inserted_id
+        results_collection.update_one(
+            {"_id": ObjectId(result_id)},
+            {"$push": {"output": output_id}}
+        )
 
-        return result_id
+        results_collection.update_one(
+            {"_id": ObjectId(result_id)},
+            {"$set": {"updated_at": datetime.now(timezone.utc)}}
+        )
+
+    def update_end_time(self, step_id):
+        steps_collection = self.db["steps"]
+        steps_collection.update_one(
+            {"_id": ObjectId(step_id)},
+            {"$set": {"end_timestamp": datetime.now(timezone.utc)}}
+        )
     
     ######### Get methods
 
@@ -260,21 +277,26 @@ def main(delay=2):
         newLogList = []
         for log in logs:
             newLogEntry= {
-            "timestamp": datetime.utcnow(),
-            "type": "INFO",
+            "stepRef": step_id,
+            "timestamp": datetime.now(timezone.utc),
             "logstring": log}
 
             newLogList.append(newLogEntry)
 
 
         dbManager = MongoManager(MONGO_URL, db_name)
-        _ = dbManager.append_logs(step_id, newLogList)
+        # _ = dbManager.append_logs(step_id, newLogList)
+        _ = dbManager.add_logs(newLogList)
         dbManager.close()
 
         time.sleep(0.2)
 
         # TODO: Improve this
         if log == "--- ODTP COMPONENT ENDING ---":
+            dbManager = MongoManager(MONGO_URL, db_name)
+            dbManager.update_end_time(step_id)
+            dbManager.close()
+
             ending_detected = True
 
         #time.sleep(delay)

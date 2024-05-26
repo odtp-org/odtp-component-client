@@ -4,10 +4,15 @@ Client for ODTP Components. This repository is aimed to be used as a submodule i
 
 ## Changelog
 
+- v0.1.0
+    - Logging in `logs` collection as individual document. 
+    - Updating `output` document
+    - Updating `result` document
+
 - v0.0.1
     - First version
     - Inluding conditional to make snapshot optionals
-    - Adding quiet flag to compressing
+    - Adding quiet flag to compressing odtp-output
 
 # Acknowledgments, Copyright, and Licensing
 ## Acknowledgments and Funding
