@@ -8,7 +8,7 @@ echo "STARTING ODTP COMPONENT"
 sleep 2
 
 ## ODTP LOGGER in the background
-if [ -v ODTP_MONGO_SERVER ]; then
+if [ -v ODTP_MONGO_SERVER ] && [ "$ODTP_LOGS_IN_DB" == "TRUE" ]; then
     echo "STARTING LOGGING IN MONGO SERVER"
     python3 /odtp/odtp-component-client/logger.py >> /odtp/odtp-logs/odtpLoggerDebugging.txt 2>&1 &
 else
@@ -55,7 +55,6 @@ if [ "ODTP_SAVE_SNAPSHOT" == "TRUE" ]; then
     mv ../odtp-snapshot.zip odtp-snapshot.zip
 fi
 
-
 ## Saving Snapshot in s3
 
 if [[ -v ODTP_S3_SERVER && -v ODTP_MONGO_SERVER ]]; then
@@ -65,17 +64,7 @@ else
     echo "ODTP_S3_SERVER does not exist"
 fi
 
-# ## Copying logs into output 
-# cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
+## Copying logs into output
 
-# if [ -v ODTP_S3_SERVER ]; then
-#     cp /odtp/odtp-logs/odtpLoggerDebugging.txt /odtp/odtp-output/odtpLoggerDebugging.txt
-# else
-#     echo "ODTP_S3_SERVER doesn't exist. Not copying log files."
-# fi
-
-# if [[ -v ODTP_S3_SERVER && -v ODTP_MONGO_SERVER ]]; then
-#     cp /odtp/odtp-logs/odtpS3UploadedDebugging.txt /odtp/odtp-output/odtpS3UploadedDebugging.txt
-# else
-#     echo "ODTP_S3_SERVER doesn't exist. Not copying log files."
-# fi
+if [ "$ODTP_LOGS_AS_FILE" == "TRUE" ]; then
+    cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
