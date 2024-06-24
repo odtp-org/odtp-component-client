@@ -1,15 +1,17 @@
-from datetime import datetime, timezone
-import os
-import time
 import logging
-import boto3
+import os
 import sys
+import time
+from datetime import datetime, timezone
 
-sys.path.append('/odtp/odtp-app/odtp-client')
+import boto3
+
+sys.path.append("/odtp/odtp-app/odtp-client")
 from logger import MongoManager
 
-### This method needs to create a new entry in snapshots MONGODB and upload the output.zip to s3. 
-### At this moment the structure is not that important as to make things works together. 
+### This method needs to create a new entry in snapshots MONGODB and upload the output.zip to s3.
+### At this moment the structure is not that important as to make things works together.
+
 
 class s3Manager:
     def __init__(self, s3Server, bucketName, accessKey, secretKey):
@@ -21,14 +23,17 @@ class s3Manager:
         self.connect()
 
         # Add logging Info
-        
+
     # Method to connect to s3 server
     def connect(self):
-        s3 = boto3.client('s3', endpoint_url=self.s3Server,
-                    aws_access_key_id=self.accessKey, 
-                    aws_secret_access_key=self.secretKey)
-        
-        self.s3 = s3 
+        s3 = boto3.client(
+            "s3",
+            endpoint_url=self.s3Server,
+            aws_access_key_id=self.accessKey,
+            aws_secret_access_key=self.secretKey,
+        )
+
+        self.s3 = s3
 
         # Add logging info
 
@@ -48,12 +53,12 @@ class s3Manager:
 
         for path in structure:
             # Add a trailing slash to make S3 recognize it as a folder
-            self.s3.put_object(Bucket=self.bucketName, Key=path + '/')
+            self.s3.put_object(Bucket=self.bucketName, Key=path + "/")
 
         print("Folder Structure Created")
 
-    # Method to create a specific folder 
-    # The idea is to create paths such as Digital Twin > Execution > Step > Output 
+    # Method to create a specific folder
+    # The idea is to create paths such as Digital Twin > Execution > Step > Output
     def createFolder(self, path):
         """
         Creates a specific folder in the S3 bucket.
@@ -64,7 +69,7 @@ class s3Manager:
         Returns:
             None
         """
-        self.s3.put_object(Bucket=self.bucketName, Key=path + '/')
+        self.s3.put_object(Bucket=self.bucketName, Key=path + "/")
         logging.info(f"Folder '{path}' created")
 
     # Method to upload one file to specific path in s3
@@ -101,29 +106,27 @@ class s3Manager:
     # Method to list folders in s3
     def checkObjects(self):
 
-        response = self.s3.list_objects_v2(Bucket=self.bucketName, 
-                                           Delimiter='/')
-        
+        response = self.s3.list_objects_v2(Bucket=self.bucketName, Delimiter="/")
+
         folders = []
-        if 'CommonPrefixes' in response:
-            for prefix in response['CommonPrefixes']:
-                folders.append(prefix['Prefix'])
-                
+        if "CommonPrefixes" in response:
+            for prefix in response["CommonPrefixes"]:
+                folders.append(prefix["Prefix"])
+
         return folders
 
     # Method to delete all objects in s3
     def deleteAll(self):
-        
+
         bucket = self.s3.Bucket(self.bucketName)
-        
+
         # This will delete all objects in the bucket.
         bucket.objects.all().delete()
 
         print("Folder Structure Deleted")
 
-    # Method to delete one file in s3 
+    # Method to delete one file in s3
     def deleteFile(self, s3_path):
-    
         """
         Deletes a file from a specific path in the S3 bucket.
 
@@ -164,10 +167,12 @@ def main():
     ## Uploading compressed output
     #########################################################################
 
-    odtpS3.uploadFile('/odtp/odtp-output/odtp-output.zip', ODTP_OUTPUT_PATH + "/odtp-output.zip")
+    odtpS3.uploadFile(
+        "/odtp/odtp-output/odtp-output.zip", ODTP_OUTPUT_PATH + "/odtp-output.zip"
+    )
 
     # Maybe this MongoDB needs to be manage outside this one?
-    file_size_bytes = os.path.getsize('/odtp/odtp-output/odtp-output.zip')
+    file_size_bytes = os.path.getsize("/odtp/odtp-output/odtp-output.zip")
 
     output_data = {
         "output_type": "output",
@@ -176,24 +181,28 @@ def main():
         "file_name": "odtp-output.zip",  # The name of the file in the output
         "file_size": file_size_bytes,  # Size of the file in bytes
         "file_type": "application/zip",  # MIME type or file type
-        "created_at": datetime.now(timezone.utc),  # Timestamp when the output was created
-        "updated_at": datetime.now(timezone.utc),  # Timestamp when the output was last updated
+        "created_at": datetime.now(
+            timezone.utc
+        ),  # Timestamp when the output was created
+        "updated_at": datetime.now(
+            timezone.utc
+        ),  # Timestamp when the output was last updated
         "metadata": {  # Additional metadata associated with the output
             "description": "Description of the snapshot",
             "tags": ["tag1", "tag2"],
-            "other_info": "Other relevant information"
+            "other_info": "Other relevant information",
         },
         "access_control": {  # Information about who can access this output
             "public": False,  # Indicates if the output is public or private
             "authorized_users": [USER_ID],  # Array of User ObjectIds who have access
-        }
+        },
     }
 
     odtp_output_id = dbManager.add_output(STEP_ID, output_data)
 
     if os.getenv("ODTP_SAVE_IN_RESULT") == "TRUE":
         dbManager.update_result(os.getenv("ODTP_RESULT"), odtp_output_id)
-    
+
     logging.info("ODTP OUTPUT UPLOADED IN {}".format(odtp_output_id))
 
     if os.getenv("ODTP_SAVE_SNAPSHOT") == "TRUE":
@@ -201,9 +210,12 @@ def main():
         ## Uploading compressed workdir snapshot
         #########################################################################
 
-        odtpS3.uploadFile('/odtp/odtp-output/odtp-snapshot.zip', ODTP_OUTPUT_PATH + "/odtp-snapshot.zip")
+        odtpS3.uploadFile(
+            "/odtp/odtp-output/odtp-snapshot.zip",
+            ODTP_OUTPUT_PATH + "/odtp-snapshot.zip",
+        )
 
-        file_size_bytes = os.path.getsize('/odtp/odtp-output/odtp-snapshot.zip')
+        file_size_bytes = os.path.getsize("/odtp/odtp-output/odtp-snapshot.zip")
 
         output_data = {
             "output_type": "snapshot",
@@ -212,23 +224,30 @@ def main():
             "file_name": "odtp-snapshot.zip",  # The name of the file in the output
             "file_size": file_size_bytes,  # Size of the file in bytes
             "file_type": "application/zip",  # MIME type or file type
-            "created_at": datetime.now(timezone.utc),  # Timestamp when the output was created
-            "updated_at": datetime.now(timezone.utc),  # Timestamp when the output was last updated
+            "created_at": datetime.now(
+                timezone.utc
+            ),  # Timestamp when the output was created
+            "updated_at": datetime.now(
+                timezone.utc
+            ),  # Timestamp when the output was last updated
             "metadata": {  # Additional metadata associated with the output
                 "description": "Description of the snapshot",
                 "tags": ["tag1", "tag2"],
-                "other_info": "Other relevant information"
+                "other_info": "Other relevant information",
             },
             "access_control": {  # Information about who can access this output
                 "public": False,  # Indicates if the output is public or private
-                "authorized_users": [USER_ID],  # Array of User ObjectIds who have access
-            }
+                "authorized_users": [
+                    USER_ID
+                ],  # Array of User ObjectIds who have access
+            },
         }
 
         odtp_output_snapshot_id = dbManager.add_output(STEP_ID, output_data)
 
-        logging.info("ODTP WORKDIR SNAPSHOT UPLOADED IN {}".format(odtp_output_snapshot_id))
-
+        logging.info(
+            "ODTP WORKDIR SNAPSHOT UPLOADED IN {}".format(odtp_output_snapshot_id)
+        )
 
     dbManager.close()
 
