@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 echo "RUNNING THE APP"
 touch /odtp/odtp-logs/log.txt
 touch /odtp/odtp-logs/odtpLoggerDebugging.txt
@@ -14,4 +13,3 @@ sleep 10
 
 # Zip logs
 zip -r /odtp/odtp-output/odtp-logs.zip odtp-logs
-set +x
