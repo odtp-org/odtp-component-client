@@ -8,44 +8,10 @@ import time
 import json
 
 
-#################################################################################
-# Testing Class MongoManager with v.0.2.0 Schema version of ID.
-# Copied from odtp. Once the repo is public we can hide it 
-
 class MongoManager:
     def __init__(self, mongodbUrl, db_name):
         self.client = MongoClient(mongodbUrl)
         self.db = self.client[db_name]
-
-    def add_user(self, user_data):
-        users_collection = self.db["users"]
-
-        return users_collection.insert_one(user_data).inserted_id
-
-    def add_component(self, component_data):
-        components_collection = self.db["components"]
-
-        return components_collection.insert_one(component_data).inserted_id
-
-    def add_version(self, componentId, version_data):
-        versions_collection = self.db["versions"]
-        version_data["componentId"] = componentId
-
-        return versions_collection.insert_one(version_data).inserted_id
-
-    def add_digital_twin(self, userRef, digital_twin_data):
-        digital_twins_collection = self.db["digitalTwins"]
-        digital_twin_data["userRef"] = userRef
-
-        digital_twin_id = digital_twins_collection.insert_one(digital_twin_data).inserted_id
-
-        # Add digital twin reference to user
-        self.db.users.update_one(
-            {"_id": userRef},
-            {"$push": {"digitalTwins": digital_twin_id}}
-        )
-
-        return digital_twin_id
     
     def add_logs(self, log_data_list):
         logs_collection = self.db["logs"]
@@ -53,36 +19,6 @@ class MongoManager:
         log_ids = logs_collection.insert_many(log_data_list).inserted_ids
 
         return log_ids
-
-
-    def append_execution(self, digital_twin_id, execution_data):
-        executions_collection = self.db["executions"]
-        execution_data["digitalTwinRef"] = digital_twin_id
-
-        execution_id = executions_collection.insert_one(execution_data).inserted_id
-
-        # Update digital twin with execution reference
-        self.db.digitalTwins.update_one(
-            {"_id": digital_twin_id},
-            {"$push": {"executions": execution_id}}
-        )
-
-        return execution_id
-
-
-    def append_step(self, execution_id, step_data):
-        steps_collection = self.db["steps"]
-        step_data["executionRef"] = execution_id
-
-        step_id = steps_collection.insert_one(step_data).inserted_id
-
-        # Update execution with step reference
-        self.db.executions.update_one(
-            {"_id": execution_id},
-            {"$push": {"steps": step_id}}
-        )
-
-        return step_id
     
     def add_output(self, step_id, output_data):
         output_collection = self.db["outputs"]
