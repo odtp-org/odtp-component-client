@@ -16,7 +16,7 @@ unset DIR
 
 # Runs app.sh script
 function run_app() {
-    bash odtp/odtp-app/app.sh
+    bash /odtp/odtp-app/app.sh
     exit_code="$?"
     if [ "$exit_code" -ne 0 ]; then
         odtp::print_error \
