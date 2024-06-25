@@ -3,10 +3,8 @@ set -e
 set -u
 set -o pipefail
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-. "$DIR/src/shell/log.sh"
-. "$DIR/src/shell/traceback.sh"
-unset DIR
+. "/odtp/odtp-component-client/src/shell/log.sh"
+. "/odtp/odtp-component-client/src/shell/traceback.sh"
 
 # You would use in `app.sh`:
 # ```shell
@@ -16,6 +14,7 @@ unset DIR
 
 # Runs app.sh script
 function run_app() {
+    odtp::print_info "Starting app. In case app is persistent. Logging may stop here. Find logs in 'odtp/odtp-logs'"
     bash /odtp/odtp-app/app.sh
     exit_code="$?"
     if [ "$exit_code" -ne 0 ]; then
@@ -29,11 +28,11 @@ function run_app() {
 function start_logger() {
 ## ODTP LOGGER in the background
     if [[ -v ODTP_MONGO_SERVER && "${ODTP_LOGS_IN_DB:-}" == "TRUE" ]]; then
-        odtp::print_info "STARTING LOGGING IN 'ODTP_MONGO_SERVER' since 'ODTP_LOGS_IN_DB' is "
+        odtp::print_info "STARTING python logger in the background."
         # as command is started in the background there will be no exit code available for it
         python3 /odtp/odtp-component-client/logger.py >> /odtp/odtp-logs/odtpLoggerDebugging.txt 2>&1 &
     else
-        echo "'ODTP_MONGO_SERVER' does not exist or 'ODTP_LOGS_IN_DB' not set to 'TRUE'"
+        odtp::print_info "Logging to mongo db disabled"
     fi
     return 0
 }
