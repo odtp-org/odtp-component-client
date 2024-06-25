@@ -1,72 +1,102 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
+set -u
+set -o pipefail
 
-#########################################################
-# ODTP COMPONENT TEMPLATE
-#########################################################
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+. "$DIR/src/shell/log.sh"
+. "$DIR/src/shell/traceback.sh"
+unset DIR
 
-echo "STARTING ODTP COMPONENT"
-sleep 2
+# You would use in `app.sh`:
+# ```shell
+# . "/odtp/odtp-component-client/src/shell/log.sh"
+# . "/odtp/odtp-component-client/src/shell/traceback.sh"
+# ```
 
-## ODTP LOGGER in the background
-if [[ -v ODTP_MONGO_SERVER && "${ODTP_LOGS_IN_DB:-}" == "TRUE" ]]; then
-    echo "STARTING LOGGING IN 'ODTP_MONGO_SERVER'"
-    python3 /odtp/odtp-component-client/logger.py >> /odtp/odtp-logs/odtpLoggerDebugging.txt 2>&1 &
-else
-    echo "'ODTP_MONGO_SERVER' does not exist or 'ODTP_LOGS_IN_DB' not set to 'TRUE'"
-fi
+function run_app() {
+    bash odtp/odtp-app/app.sh
+    exit_code="$?"
 
+    if [ "$exit_code" -ne 0 ]; then
+        odtp::print_error \
+            "App 'app.sh' failed with exit code '$exit_code'."
+    fi
 
-############################################################################################
-# USER APP
-############################################################################################
+    return 0
 
-bash /odtp/odtp-app/app.sh
+}
 
-############################################################################################
-# END OF USER APP
-############################################################################################
+function main() {
 
-#########################################################
-# TRANSFERRING INPUT TO OUTPUT 
-#########################################################
+    #########################################################
+    # ODTP COMPONENT TEMPLATE
+    #########################################################
 
-if [[ "${TRANSFER_INPUT_TO_OUTPUT:-}" == "TRUE" ]]; then
-    echo "COPYING INPUT FILES TO OUTPUT because 'TRANSFER_INPUT_TO_OUTPUT' is 'TRUE'"
-    cp -r /odtp/odtp-input/* /odtp/odtp-output
-fi
+    odtp::print_error "Starting odtp component."
+    sleep 2
 
-#########################################################
-# COMPRESS THE OUTPUT FOLDER GENERATED
-#########################################################
+    run_app
 
-#  Take output and export it
-cd /odtp/odtp-output
-zip -rq ../odtp-output.zip ./*
-mv ../odtp-output.zip odtp-output.zip
+    ## ODTP LOGGER in the background
+    if [ -v ODTP_MONGO_SERVER ]; then
+        odtp::print_error "Starting logging in mongo server."
+        python3 /odtp/odtp-component-client/logger.py \
+            >>/odtp/odtp-logs/odtpLoggerDebugging.txt 2>&1 &
+    else
+        echo "Env. variable 'ODTP_MONGO_SERVER' does not exist. "
+    fi
 
-#########################################################
-# ODTP SNAPSHOT CREATION 
-#########################################################
+    ############################################################################################
+    # USER APP
+    ############################################################################################
 
-# Take snapshot of workdir
-if [[ "${ODTP_SAVE_SNAPSHOT:-}" = "TRUE" ]]; then
-    cd /odtp/odtp-workdir
-    zip -rq ../odtp-snapshot.zip ./*
-    mv ../odtp-snapshot.zip odtp-snapshot.zip
-fi
+    bash odtp/odtp-app/app.sh ||
+        odtp::print_error "Failed to run 'app.sh'."
 
-## Saving Snapshot in s3
+    ############################################################################################
+    # END OF USER APP
+    #########################################################
+    # TRANSFERRING INPUT TO OUTPUT
+    #########################################################
 
-if [[ -v ODTP_S3_SERVER && -v ODTP_MONGO_SERVER ]]; then
-    echo "Uploading to ODTP_S3_SERVER because 'ODTP_S3_SERVER' and 'ODTP_MONGO_SERVER' are both set"
-    python3 /odtp/odtp-component-client/s3uploader.py 2>&1 | tee /odtp/odtp-logs/odtpS3UploadedDebugging.txt  
-else
-    echo "Not uploading to S3 since either 'ODTP_S3_SERVER' or 'ODTP_MONGO_SERVER' is not specified"
-fi
+    if [ "${TRANSFER_INPUT_TO_OUTPUT:-}" == "TRUE" ]; then
+        odtp::print_error \
+            "Copying input files '/odpt/odtp-input' to '/odtp/odpt-output'."
+        cp -r /odtp/odtp-input/* /odtp/odtp-output
+    fi
 
-## Copying logs into output
+    #########################################################
+    # COMPRESS THE OUTPUT FOLDER GENERATED
+    #########################################################
 
-if [[ "${ODTP_LOGS_AS_FILE:-}" == "TRUE" ]]; then
-    echo "Writing log files to output since 'ODTP_LOGS_AS_FILE' is set to 'TRUE'"
-    cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
-fi
+    #  Take output and export it
+    cd /odtp/odtp-output
+    zip -rq ../odtp-output.zip ./*
+    mv ../odtp-output.zip odtp-output.zip
+
+    #########################################################
+    # ODTP SNAPSHOT CREATION
+    #########################################################
+
+    # Take snapshot of workdir
+    if [ "${ODTP_SAVE_SNAPSHOT:-}" = "TRUE" ]; then
+        cd /odtp/odtp-workdir
+        zip -rq ../odtp-snapshot.zip ./*
+        mv ../odtp-snapshot.zip odtp-snapshot.zip
+    fi
+
+    ## Saving Snapshot in s3
+
+    if [[ -v ODTP_S3_SERVER && -v ODTP_MONGO_SERVER ]]; then
+        odtp::print_error "Uploading output to '$ODTP_S3_SERVER'."
+
+        python3 /odtp/odtp-component-client/s3uploader.py 2>&1 |
+            tee /odtp/odtp-logs/odtpS3UploadedDebugging.txt
+    else
+        odtp::print_error "Env. variable 'ODTP_S3_SERVER' does not exist."
+    fi
+
+}
+
+main "$@"
