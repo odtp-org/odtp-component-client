@@ -41,7 +41,7 @@ fi
 
 #  Take output and export it
 cd /odtp/odtp-output
-zip -rq ../odtp-output.zip *
+zip -rq ../odtp-output.zip ./*
 mv ../odtp-output.zip odtp-output.zip
 
 #########################################################
@@ -49,9 +49,9 @@ mv ../odtp-output.zip odtp-output.zip
 #########################################################
 
 # Take snapshot of workdir
-if [ "ODTP_SAVE_SNAPSHOT" == "TRUE" ]; then
+if [[ "${ODTP_SAVE_SNAPSHOT:-}" = "TRUE" ]]; then
     cd /odtp/odtp-workdir
-    zip -rq ../odtp-snapshot.zip *
+    zip -rq ../odtp-snapshot.zip ./*
     mv ../odtp-snapshot.zip odtp-snapshot.zip
 fi
 
@@ -68,3 +68,4 @@ fi
 
 if [ "$ODTP_LOGS_AS_FILE" == "TRUE" ]; then
     cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
+fi
