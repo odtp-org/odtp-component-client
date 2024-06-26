@@ -70,8 +70,6 @@ class MongoManager:
             {"_id": ObjectId(step_id)},
             {"$set": {"end_timestamp": datetime.now(timezone.utc)}}
         )
-    
-    ######### Get methods
 
     def get_all_collections_as_dict(self):
             """
@@ -196,8 +194,6 @@ class LogReader:
 # This method will push the log to an existing execution step
 
 def main(delay=2):
-    print("LOGGER ACTIVATED")
-    print("##################################")
     ### Create Entry
     MONGO_URL = os.getenv("ODTP_MONGO_SERVER")
     step_id = os.getenv("ODTP_STEP_ID")
