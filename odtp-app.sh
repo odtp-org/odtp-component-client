@@ -3,8 +3,8 @@ set -e
 set -u
 set -o pipefail
 
-bash source "/odtp/odtp-component-client/src/shell/log.sh"
-bash source "/odtp/odtp-component-client/src/shell/traceback.sh"
+source "/odtp/odtp-component-client/src/shell/log.sh"
+source "/odtp/odtp-component-client/src/shell/traceback.sh"
 
 # You would use in `app.sh`:
 # ```shell
