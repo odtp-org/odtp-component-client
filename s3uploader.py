@@ -60,9 +60,6 @@ class s3Manager:
 
 
 def main():
-    print("S3 UPLOADER ACTIVATED")
-    print("###########################")
-
     S3_SERVER = os.getenv("ODTP_S3_SERVER")
     BUCKET_NAME = os.getenv("ODTP_BUCKET_NAME")
     ACCESS_KEY = os.getenv("ODTP_ACCESS_KEY")
