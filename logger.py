@@ -64,11 +64,11 @@ class MongoManager:
             {"$set": {"updated_at": datetime.now(timezone.utc)}}
         )
 
-    def update_end_time(self, step_id):
+    def update_timestamp(self, step_id, field):
         steps_collection = self.db["steps"]
         steps_collection.update_one(
             {"_id": ObjectId(step_id)},
-            {"$set": {"end_timestamp": datetime.now(timezone.utc)}}
+            {"$set": {field: datetime.now(timezone.utc)}}
         )
 
     def get_all_collections_as_dict(self):
@@ -198,6 +198,10 @@ def main(delay=2):
     MONGO_URL = os.getenv("ODTP_MONGO_SERVER")
     step_id = os.getenv("ODTP_STEP_ID")
     db_name = "odtp"
+
+    dbManager = MongoManager(MONGO_URL, db_name)
+    dbManager.update_timestamp(step_id, "start_timestamp")
+    dbManager.close()
     
     log_reader = LogReader('/odtp/odtp-logs/log.txt')
 
@@ -226,7 +230,7 @@ def main(delay=2):
         # TODO: Improve this
         if log == "--- ODTP COMPONENT ENDING ---":
             dbManager = MongoManager(MONGO_URL, db_name)
-            dbManager.update_end_time(step_id)
+            dbManager.update_timestamp(step_id, "end_timestamp")
             dbManager.close()
 
             ending_detected = True
