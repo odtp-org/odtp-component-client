@@ -4,6 +4,14 @@ Client for ODTP Components. This repository is aimed to be used as a submodule i
 
 ## Changelog
 
+- v0.1.2
+    - Make logging to file the default
+    - Log to mongodb only when the parameter ODTP_LOGS_IN_DB=TRUE
+
+- v0.1.1
+    - Logging with logging library in `src` that also provides tracebacks
+    - Add parameters for logging to file and logging to mongod
+
 - v0.1.0
     - Logging in `logs` collection as individual document. 
     - Updating `output` document
