@@ -2,6 +2,8 @@ import yaml
 import os
 import re
 import sys
+import logging
+
 
 def __readTemplate(templatefile):
     """
@@ -15,10 +17,10 @@ def __readTemplate(templatefile):
 
 def __replaceListParameters(content, listPlaceholders, parameterValue):
     """
-    :param content:
+    :param content: original file content
     :param listPlaceholders:
     :param parameterValue:
-    :return:
+    :return: content with replacements of placeholders
     """
     for p, v in zip(listPlaceholders, parameterValue):
             content = content.replace(f"{{{{{p}}}}}", v)
@@ -74,7 +76,7 @@ def __process_file(filepath, outputfilepath):
     template = __readTemplate(filepath)
     templateFilled = __replaceListParameters(template, placeholders, placeholderValue)
     outputfilepath = __saveConfigFile(templateFilled, outputfilepath)
-    print(f"Outputfile available: {outputfilepath}.")
+    print(f"Output file available: {outputfilepath}.")
     if placeholders_not_found:
         print(f"Some placeholders could not be filled: check your environment "
               f"variables to resolve the errors.")
