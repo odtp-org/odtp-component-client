@@ -142,14 +142,12 @@ function upload_snapshot () {
 
 function move_logs_to_output () {
 
-    if [[ "${ODTP_LOGS_AS_FILE:-}" == "TRUE" ]]; then
-        odtp::print_info "Copying the logs to the output directory"
-        cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
+    odtp::print_info "Copying the logs to the output directory"
+    cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
 
-        if [ "$exit_code" -ne 0 ]; then
-            odtp::print_error \
-                "copying log files to output failed with '$exit_code'."
-        fi       
+    if [ "$exit_code" -ne 0 ]; then
+        odtp::print_error \
+            "copying log files to output failed with '$exit_code'."
     fi
 
     return 0
