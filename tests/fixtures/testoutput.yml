@@ -1,0 +1,42 @@
+## Synthetic population pipeline for Corsica
+## based on the synpp package
+
+# This is the path to a directory where the pipeline can store temporary data
+working_directory: /odtp/odtp-workdir/cache
+
+# This section defines which parts of the pipeline should be run
+run:
+  - synthesis.output
+
+# Here the configuraiton of the pipeline starts
+config:
+  # Some general configuration
+  processes: some_processes
+  osmosis_binary: /tmp/osmosis/bin/osmosis
+  maven_binary: /tmp/maven/apache-maven-3.6.3/bin/mvn
+
+  # Define whether to use ENTD or EGT as the household travel survey (HTS)
+  hts: some_hts
+
+  # Define sampling rate and random seed for the output population
+  sampling_rate: some_sampling_rate
+  random_seed: some_random_seed
+
+  # Paths to the input data and where the output should be stored
+  data_path: /odtp/odtp-workdir/data
+  output_path: /odtp/odtp-workdir/output
+  output_prefix: NotFound
+
+  # Only interesting if you run the simulation
+  java_memory: some_java_memory
+
+  # Activate if you want to run mode choice
+  mode_choice: false
+
+  # Corsica settings
+  regions: [94]
+  gtfs_path: gtfs_corsica
+  osm_path: osm_corsica
+  ban_path: ban_corsica
+  bdtopo_path: bdtopo_corsica
+  matching_minimum_observations: 5
