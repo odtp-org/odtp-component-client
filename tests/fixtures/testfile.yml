@@ -40,3 +40,4 @@ config:
   ban_path: ban_corsica
   bdtopo_path: bdtopo_corsica
   matching_minimum_observations: 5
+  
