@@ -13,7 +13,8 @@ from pathlib import Path
 
 ODTP_MONGO_DB = "odtp"
 LOGS_COLLECTION = "logs"
-DRYRUN = "--dryrun"
+LOG_WATCH_PATH = "/odtp/odtp-logs/log.txt"
+LOG_WATCH_INTERVAL = 5
 
 class MongoManager(object):
     def __init__(self):
@@ -68,27 +69,31 @@ class LogReader:
         return lines
 
 
-def process_logs(log_streaming_path, breaksecs=10, dryrun=False):
+def process_logs():
     """
     Observe bash logs and write them to the mongo db
     """
     if not dryrun:
         db_manager = MongoManager()
-    log_reader = LogReader(log_streaming_path)
-    break_in_secs = os.getenv("ODTP_DB_LOG_INTERVAL", default=10)
+    log_reader = LogReader(LOG_WATCH_PATH)
+    pagesize = os.getenv("ODTP_DB_LOG_PAGESIZE", default=500)
 
     # Active until it finds "--- ODTP COMPONENT ENDING ---"
     ending_detected = False
+    log_page_list = []
     while ending_detected == False:
         # take breaks between reading the log file
-        time.sleep(break_in_secs)
-        #import pdb; pdb.set_trace()
-        log_batch = log_reader.read_from_last_position()
-        log_page = json.dumps(log_batch)
-        print(log_page)
-        if not dryrun:
+        time.sleep(LOG_WATCH_INTERVAL)
+        log_read_batch = log_reader.read_from_last_position()
+        cond_page_not_full = len(log_page_list) + len(log_read_batch) <= pagesize
+        cond_ending_detected = "--- ODTP COMPONENT ENDING ---" in log_batch
+        cond_continue_reading = cond_page_not_full or cond_ending_detected
+        if not cond_continue_reading:
+            log_page_list.extend(log_batch)
+        else:
+            log_page = json.dumps(log_batch)
             db_manager.__add_logs_to_mongodb(log_page)
-        if "--- ODTP COMPONENT ENDING ---" in log_batch:
+        if cond_ending_detected:
             break
 
 
@@ -96,11 +101,4 @@ if __name__ == '__main__':
     # this script is called from inside the odtp client and logs to the
     # mongodb during the execution of bashscripts
     time.sleep(0.2)
-    parser = argparse.ArgumentParser()
-    parser.add_argument("log_streaming_path")
-    parser.add_argument("--dryrun", action="store_true")
-    parser.add_argument("--breaksecs", action="store_true")
-    args = parser.parse_args()
-    if not args.dryrun:
-        dryrun = False
-    process_logs(log_streaming_path=args.log_streaming_path, dryrun=args.dryrun)
+    process_logs()
