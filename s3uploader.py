@@ -67,7 +67,7 @@ def main():
     STEP_ID = os.getenv("ODTP_STEP_ID")
     odtpS3 = s3Manager(S3_SERVER, BUCKET_NAME, ACCESS_KEY, SECRET_KEY)
     try:
-        db_manager = MongoManager()
+        dbManager = MongoManager()
     except Exception as e:
         sys.exit(f"Mongo manager failed to load: Exception {e} occurred")
 

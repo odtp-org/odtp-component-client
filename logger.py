@@ -115,14 +115,26 @@ def process_logs():
         # take breaks between reading the log file
         time.sleep(LOG_WATCH_INTERVAL)
         log_read_batch = log_reader.read_from_last_position()
-        cond_page_not_full = len(log_page_list) + len(log_read_batch) <= pagesize
-        cond_ending_detected = "--- ODTP COMPONENT ENDING ---" in log_batch
-        cond_continue_reading = cond_page_not_full or cond_ending_detected
-        if not cond_continue_reading:
-            log_page_list.extend(log_batch)
-        else:
-            log_page = json.dumps(log_batch)
-            db_manager.__add_logs_to_mongodb(log_page)
+
+        # check status of logs and log page
+        page_not_full = len(log_page_list) + len(log_read_batch) <= pagesize
+        finish_reading = "--- ODTP COMPONENT ENDING ---" in log_read_batch
+
+        # if log page not full and log reading not finished: continue reading
+        if page_not_full and not finish_reading:
+            # copy batch to page and contiue reading
+            log_page_list.extend(log_read_batch)
+            continue
+
+        # otherwise: process log page
+        log_page = json.dumps(log_page_list)
+        db_manager.__add_logs_to_mongodb(log_page)
+
+        # intialize next log_page_list
+        if not finish_reading:
+            log_page_list = log_read_batch
+
+        # when reading is finished: break
         if cond_ending_detected:
             break
 
