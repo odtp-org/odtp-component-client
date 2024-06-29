@@ -15,6 +15,7 @@ ODTP_MONGO_DB = "odtp"
 LOGS_COLLECTION = "logs"
 LOG_WATCH_PATH = "/odtp/odtp-logs/log.txt"
 LOG_WATCH_INTERVAL = 5
+ODTP_DB_LOG_PAGESIZE = 500
 
 class MongoManager(object):
     def __init__(self):
@@ -73,10 +74,9 @@ def process_logs():
     """
     Observe bash logs and write them to the mongo db
     """
-    if not dryrun:
-        db_manager = MongoManager()
+    db_manager = MongoManager()
     log_reader = LogReader(LOG_WATCH_PATH)
-    pagesize = os.getenv("ODTP_DB_LOG_PAGESIZE", default=500)
+    pagesize = ODTP_DB_LOG_PAGESIZE
 
     # Active until it finds "--- ODTP COMPONENT ENDING ---"
     ending_detected = False
