@@ -1,22 +1,20 @@
 #!/usr/bin/env python
 
-from pymongo import MongoClient, errors
+from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime, timezone
 import os
 import sys
 import time
 import json
-import argparse
 import datetime
-from pathlib import Path
 
 
 ODTP_MONGO_DB = "odtp"
 LOGS_COLLECTION = "logs"
 STEPS_COLLECTION = "steps"
 RESULTS_COLLECTION = "results"
-OUTPUT_COLLECTION = "outputs"
+OUTPUTS_COLLECTION = "outputs"
 LOG_WATCH_PATH = "/odtp/odtp-logs/log.txt"
 LOG_WATCH_INTERVAL = 5
 ODTP_DB_LOG_PAGESIZE = 500
@@ -30,11 +28,11 @@ class MongoManager(object):
         self.logs_collection = self.db[LOGS_COLLECTION]
 
     def __add_logs_to_mongodb(self, log_page):
-        log_entry = __format_log_entry(log_page)
+        log_entry = self.__format_log_entry(log_page)
         log_ids = self.logs_collection.insert_many(log_entry).inserted_ids
         return log_ids
 
-    def __format_logs(self, log_page):
+    def __format_log_entry(self, log_page):
         log_entry = {
             "stepRef": self.step_id,
             "timestamp": datetime.now(timezone.utc),
@@ -71,7 +69,7 @@ class MongoManager(object):
             {"$set": {"updated_at": datetime.now(timezone.utc)}}
         )
 
-    def __close(self):
+    def close(self):
         self.client.close()
 
 
@@ -122,7 +120,7 @@ def process_logs():
 
         # if log page not full and log reading not finished: continue reading
         if page_not_full and not finish_reading:
-            # copy batch to page and contiue reading
+            # copy batch to page and continue reading
             log_page_list.extend(log_read_batch)
             continue
 
@@ -130,17 +128,18 @@ def process_logs():
         log_page = json.dumps(log_page_list)
         db_manager.__add_logs_to_mongodb(log_page)
 
-        # intialize next log_page_list
+        # initialise next log_page_list
         if not finish_reading:
             log_page_list = log_read_batch
 
         # when reading is finished: break
-        if cond_ending_detected:
+        if finish_reading:
             break
+    db_manager.close()    
 
 
 if __name__ == '__main__':
     # this script is called from inside the odtp client and logs to the
-    # mongodb during the execution of bashscripts
+    # mongodb during the execution of bash scripts
     time.sleep(0.2)
     process_logs()
