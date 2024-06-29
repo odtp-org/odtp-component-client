@@ -4,6 +4,7 @@
 #from bson import ObjectId
 from datetime import datetime, timezone
 import os
+import sys
 import time
 import json
 import argparse
@@ -13,6 +14,7 @@ from pathlib import Path
 
 ODTP_MONGO_DB = "odtp"
 LOGS_COLLECTION = "logs"
+STEPS_COLLECTION = "steps"
 RESULTS_COLLECTION = "results"
 OUTPUT_COLLECTION = "outputs"
 LOG_WATCH_PATH = "/odtp/odtp-logs/log.txt"
@@ -21,13 +23,12 @@ ODTP_DB_LOG_PAGESIZE = 500
 
 class MongoManager(object):
     def __init__(self):
-        self.mongodb_url = os.getenv(ODTP_MONGO_SERVER)
+        self.mongodb_url = os.getenv("ODTP_MONGO_SERVER")
         self.__check_db_connection()
         self.client = MongoClient(mongodb_url)
         self.db = self.client[ODTP_MONGO_DB]
-        self.step_id = os.getenv(ODTP_STEP_ID)
-        self.logs_collection = self.db["logs"]
-        self.steps_collection = self.db["steps"]
+        self.step_id = os.getenv("ODTP_STEP_ID")
+        self.logs_collection = self.db[LOGS_COLLECTION]
 
     def __check_db_connection(self):
         with MongoClient(self.mongodb_url, serverSelectionTimeoutMS=2000) as client:
@@ -108,7 +109,7 @@ def process_logs():
     try:
         db_manager = MongoManager()
     except Exception as e:
-        sys.exit("Mongo manager failed to load: Exception {e} occurred")
+        sys.exit(f"Mongo manager failed to load: Exception {e} occurred.")
     log_reader = LogReader(LOG_WATCH_PATH)
     pagesize = ODTP_DB_LOG_PAGESIZE
 
