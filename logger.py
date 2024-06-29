@@ -27,12 +27,12 @@ class MongoManager(object):
         self.step_id = os.getenv("ODTP_STEP_ID")
         self.logs_collection = self.db[LOGS_COLLECTION]
 
-    def __add_logs_to_mongodb(self, log_page):
-        log_entry = self.__format_log_entry(log_page)
+    def add_logs_to_mongodb(self, log_page):
+        log_entry = self.format_log_entry(log_page)
         log_ids = self.logs_collection.insert_many(log_entry).inserted_ids
         return log_ids
 
-    def __format_log_entry(self, log_page):
+    def format_log_entry(self, log_page):
         log_entry = {
             "stepRef": self.step_id,
             "timestamp": datetime.now(timezone.utc),
@@ -126,7 +126,7 @@ def process_logs():
 
         # otherwise: process log page
         log_page = json.dumps(log_page_list)
-        db_manager.__add_logs_to_mongodb(log_page)
+        db_manager.add_logs_to_mongodb(log_page)
 
         # initialise next log_page_list
         if not finish_reading:
