@@ -69,7 +69,7 @@ def main():
     try:
         db_manager = MongoManager()
     except Exception as e:
-        sys.exit("Mongo manager failed to load: Exception {e} occurred")
+        sys.exit(f"Mongo manager failed to load: Exception {e} occurred")
 
     USER_ID = os.getenv("ODTP_USER_ID")
     ODTP_OUTPUT_PATH = f"odtp/{STEP_ID}"
