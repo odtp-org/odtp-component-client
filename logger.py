@@ -23,7 +23,7 @@ ODTP_DB_LOG_PAGESIZE = 500
 
 class MongoManager(object):
     def __init__(self):
-        self.mongodb_url = os.getenv("ODTP_MONGO_SERVER")
+        mongodb_url = os.getenv("ODTP_MONGO_SERVER")
         self.client = MongoClient(mongodb_url)
         self.db = self.client[ODTP_MONGO_DB]
         self.step_id = os.getenv("ODTP_STEP_ID")
