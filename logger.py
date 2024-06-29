@@ -7,7 +7,6 @@ import os
 import sys
 import time
 import json
-import datetime
 
 
 ODTP_MONGO_DB = "odtp"
