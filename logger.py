@@ -13,6 +13,8 @@ from pathlib import Path
 
 ODTP_MONGO_DB = "odtp"
 LOGS_COLLECTION = "logs"
+RESULTS_COLLECTION = "results"
+OUTPUT_COLLECTION = "outputs"
 LOG_WATCH_PATH = "/odtp/odtp-logs/log.txt"
 LOG_WATCH_INTERVAL = 5
 ODTP_DB_LOG_PAGESIZE = 500
@@ -44,6 +46,35 @@ class MongoManager(object):
         }
         return log_entry
 
+    def add_output(self, step_id, output_data):
+        output_collection = self.db[OUTPUTS_COLLECTION]
+        output_data["stepRef"] = step_id
+
+        # TODO: Make its own function. Taking out user_id
+        #output_data["access_control"]["authorized_users"] = user_id
+
+        output_id = output_collection.insert_one(output_data).inserted_id
+
+        # Update steps with execution reference
+        self.db.steps.update_one(
+            {"_id": ObjectId(step_id)},  # Specify the document to update
+            {"$set": {"output": output_id}}  # Use $set to replace the value of a field
+        )
+
+        return output_id
+
+    def update_result(self, result_id, output_id):
+        results_collection = self.db[RESULTS_COLLECTION]
+        results_collection.update_one(
+            {"_id": ObjectId(result_id)},
+            {"$push": {"output": output_id}}
+        )
+
+        results_collection.update_one(
+            {"_id": ObjectId(result_id)},
+            {"$set": {"updated_at": datetime.now(timezone.utc)}}
+        )
+
     def __close(self):
         self.client.close()
 
@@ -74,7 +105,10 @@ def process_logs():
     """
     Observe bash logs and write them to the mongo db
     """
-    db_manager = MongoManager()
+    try:
+        db_manager = MongoManager()
+    except Exception as e:
+        sys.exit("Mongo manager failed to load: Exception {e} occurred")
     log_reader = LogReader(LOG_WATCH_PATH)
     pagesize = ODTP_DB_LOG_PAGESIZE
 
