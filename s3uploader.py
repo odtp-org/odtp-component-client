@@ -6,7 +6,7 @@ import boto3
 import sys
 
 sys.path.append('/odtp/odtp-app/odtp-client')
-from logger import MongoManager
+from mongouploader import MongoManager
 
 ### This method needs to create a new entry in snapshots MONGODB and upload the output.zip to s3. 
 ### At this moment the structure is not that important as to make things works together. 
@@ -66,10 +66,10 @@ def main():
     SECRET_KEY = os.getenv("ODTP_SECRET_KEY")
     STEP_ID = os.getenv("ODTP_STEP_ID")
     odtpS3 = s3Manager(S3_SERVER, BUCKET_NAME, ACCESS_KEY, SECRET_KEY)
-
-    MONGO_URL = os.getenv("ODTP_MONGO_SERVER")
-    db_name = "odtp"
-    dbManager = MongoManager(MONGO_URL, db_name)
+    try:
+        dbManager = MongoManager()
+    except Exception as e:
+        sys.exit(f"Mongo manager failed to load: Exception {e} occurred")
 
     USER_ID = os.getenv("ODTP_USER_ID")
     ODTP_OUTPUT_PATH = f"odtp/{STEP_ID}"

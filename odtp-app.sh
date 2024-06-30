@@ -27,20 +27,6 @@ function run_app() {
     return 0
 }
 
-function start_logger() {
-
-    if [[ -v ODTP_MONGO_SERVER && "${ODTP_LOGS_IN_DB:-}" == "TRUE" ]]; then
-
-        odtp::print_info "starting python logger in the background."
-        python3 /odtp/odtp-component-client/logger.py >> /odtp/odtp-logs/odtpLoggerDebugging.txt 2>&1 &
-
-    else
-        odtp::print_info "Logging to mongo db disabled"
-    fi
-
-    return 0
-}
-
 function transfer_input_to_output() {
 
     if [ "${TRANSFER_INPUT_TO_OUTPUT:-}" == "TRUE" ]; then
@@ -157,15 +143,7 @@ function move_logs_to_output () {
 function main() {
     odtp::print_info "Starting odtp component."
 
-    # preprocessing for running the app
-
-    # Some strange sleep to workaround what? ... we dont know
-    sleep 2
-
-    start_logger
-
     # this runs the app
-
     run_app
 
     # post processing after running the app

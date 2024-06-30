@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Test script for the python script 'parameters.py' that is called externally:
 # One variable is set to missing so that it can be checked how the script
 # behaves in that case
