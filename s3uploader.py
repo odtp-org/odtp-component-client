@@ -6,7 +6,7 @@ import boto3
 import sys
 
 sys.path.append('/odtp/odtp-app/odtp-client')
-from logger import MongoManager
+from mongouploader import MongoManager
 
 ### This method needs to create a new entry in snapshots MONGODB and upload the output.zip to s3. 
 ### At this moment the structure is not that important as to make things works together. 
