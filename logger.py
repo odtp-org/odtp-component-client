@@ -57,13 +57,15 @@ def main():
 
         if newLogList:    
             _ = dbManager.add_logs(newLogList)
-        dbManager.close()
 
         time.sleep(DELAY)
 
         # TODO: Improve this
         if log == LOG_END_STRING:
             ending_detected = True
+            break
+
+    dbManager.close()        
 
 
 if __name__ == '__main__':
