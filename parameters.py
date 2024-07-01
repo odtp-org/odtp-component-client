@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 import yaml
 import os
 import re
