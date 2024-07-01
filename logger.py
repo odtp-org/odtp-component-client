@@ -56,13 +56,7 @@ def main():
 
         if len(log_page) >= 10:
             print(f"length log_page >= 10: {len(log_page)}")
-            log_page_entry = {
-                "stepRef": step_id,
-                "timestamp": datetime.now(timezone.utc),
-                "logstring": "\n".join(log_page)                
-            }
-            print(f"add log_page_entry to db: {log_page_entry}")
-            _ = dbManager.add_log_page(log_page_entry)
+            _ = dbManager.add_log_page(log_page)
             print("empty log_page")
             log_page = []
 
