@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 from datetime import datetime, timezone
 import os
-import time
 import logging
 import boto3
 import sys

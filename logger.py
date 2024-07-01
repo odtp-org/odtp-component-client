@@ -3,6 +3,7 @@
 from mongouploader import MongoManager
 from datetime import datetime, timezone
 import os
+import sys
 import time
 
 
@@ -54,7 +55,8 @@ def main():
 
             newLogList.append(newLogEntry)
 
-        _ = dbManager.add_logs(newLogList)
+        if newLogList:    
+            _ = dbManager.add_logs(newLogList)
         dbManager.close()
 
         time.sleep(DELAY)

@@ -24,20 +24,7 @@ class MongoManager(object):
 
         log_ids = logs_collection.insert_many(log_data_list).inserted_ids
 
-        return log_ids
-
-    def add_logs_to_mongodb(self, log_page):
-        log_entry = self.format_log_entry(log_page)
-        log_ids = self.logs_collection.insert_many(log_entry).inserted_ids
-        return log_ids
-
-    def format_log_entry(self, log_page):
-        log_entry = {
-            "stepRef": self.step_id,
-            "timestamp": datetime.now(timezone.utc),
-            "logstring": log_page,
-        }
-        return log_entry        
+        return log_ids       
 
     def add_output(self, step_id, output_data):
         output_collection = self.db[OUTPUTS_COLLECTION]
