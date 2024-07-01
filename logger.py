@@ -40,6 +40,7 @@ def main():
         sys.exit(f"Mongo manager failed to load: Exception {e} occurred")
 
     log_reader = LogReader(LOG_FILE_PATH)
+    log_page = []
 
     # Active until it finds "--- ODTP COMPONENT ENDING ---"
     ending_detected = False
@@ -47,16 +48,18 @@ def main():
         logs = log_reader.read_from_last_position()
         
         newLogList = []
+
         for log in logs:
-            newLogEntry= {
-            "stepRef": step_id,
-            "timestamp": datetime.now(timezone.utc),
-            "logstring": log}
+            log_page.append(log)
 
-            newLogList.append(newLogEntry)
-
-        if newLogList:    
-            _ = dbManager.add_logs(newLogList)
+        if len(log_page) >= 10:
+            log_page_entry = {
+                "stepRef": step_id,
+                "timestamp": datetime.now(timezone.utc),
+                "logstring": "\n".join(log_page)                
+            }
+            _ = dbManager.add_logs(log_page_entry)
+            log_page = []
 
         time.sleep(DELAY)
 
