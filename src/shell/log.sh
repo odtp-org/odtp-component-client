@@ -43,7 +43,7 @@ function odtp::internal::print() {
   local msg
   msg=$(printf '%b\n' "$@")
   msg="${msg//$'\n'/$'\n'   }"
-  echo $flags -e "⚙️   $header$msg"
+  echo $flags -e "->   $header$msg"
 }
 
 # Trace functionality.
