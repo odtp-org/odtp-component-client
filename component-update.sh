@@ -1,11 +1,22 @@
 #!/usr/bin/env bash
 
+while IFS=',' read -ra array; do
+  ar1+=("${array[0]}")
+  ar2+=("${array[1]}")
+done < components.csv                                                       
+
+printf '%s\n' "${ar1[@]}" "${ar2[@]}"
+exit
+
 # GIT_PATH should be an empty directory
 GIT_PATH=/Users/smaennel/odtp/git
-COMPONENT_NAME=odtp-component-example
 GIT_ORG=odtp-org
 BRANCH=chore/cleanup-logger
-TAG=v0.1.3-alpha-17
+
+# component
+COMPONENT_NAME=odtp-pygwalker
+TAG=v0.1.1-alpha-7
+
 
 # derived settings
 REPO_URL=git@github.com:${GIT_ORG}/${COMPONENT_NAME}.git
