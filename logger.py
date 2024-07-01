@@ -4,7 +4,7 @@ from mongouploader import MongoManager
 from datetime import datetime, timezone
 import os
 import time
-import json
+
 
 DELAY = 0.2
 LOG_FILE_PATH = "/odtp/odtp-logs/log.txt"

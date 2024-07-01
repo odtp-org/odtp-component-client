@@ -48,6 +48,8 @@ function transfer_input_to_output() {
         odtp::print_info "copy inputs to the output directory"
         cp -r /odtp/odtp-input/* /odtp/odtp-output
 
+        exit_code="$?"
+
         if [ "$exit_code" -ne 0 ]; then
             odtp::print_error \
                 "Coping input to output failed with exit code '$exit_code'."
@@ -64,6 +66,8 @@ function compress_output () {
     odtp::print_info "move to output directory"
     cd /odtp/odtp-output
 
+    exit_code="$?"
+
     if [ "$exit_code" -ne 0 ]; then
         odtp::print_error \
             "'cd /odtp/odtp-output' failed with exit code '$exit_code'."
@@ -72,6 +76,8 @@ function compress_output () {
     odtp::print_info "zip output directory"
     zip -rq ../odtp-output.zip ./*
 
+    exit_code="$?"
+
     if [ "$exit_code" -ne 0 ]; then
         odtp::print_error \
             "'zip -rq ../odtp-output.zip ./*' failed with exit code '$exit_code'."
@@ -79,6 +85,8 @@ function compress_output () {
      
     odtp::print_info "move zipped output file"
     mv ../odtp-output.zip odtp-output.zip
+
+    exit_code="$?"
 
     if [ "$exit_code" -ne 0 ]; then
         odtp::print_error \
@@ -104,6 +112,8 @@ function compress_workdir () {
         odtp::print_info "zip workdir into a snapshot"
         zip -rq ../odtp-snapshot.zip ./*
 
+        exit_code="$?"
+
         if [ "$exit_code" -ne 0 ]; then
             odtp::print_error \
                 "'zip -rq ../odtp-snapshot.zip ./*' failed with exit code '$exit_code'."
@@ -111,6 +121,8 @@ function compress_workdir () {
       
         odtp::print_info "Move snapshot one directory up"
         mv ../odtp-snapshot.zip odtp-snapshot.zip
+
+        exit_code="$?"
 
         if [ "$exit_code" -ne 0 ]; then
             odtp::print_error \
@@ -128,6 +140,8 @@ function upload_snapshot () {
         odtp::print_info "Uploading the outputs to S3"
         python3 /odtp/odtp-component-client/s3uploader.py 2>&1 | tee /odtp/odtp-logs/odtpS3UploadedDebugging.txt
 
+        exit_code="$?"
+
         if [ "$exit_code" -ne 0 ]; then
             odtp::print_error \
                 "'python3 /odtp/odtp-component-client/s3uploader.py 2>&1 | tee /odtp/odtp-logs/odtpS3UploadedDebugging.txt' failed with '$exit_code'."
@@ -144,6 +158,8 @@ function move_logs_to_output () {
 
     odtp::print_info "Copying the logs to the output directory"
     cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
+
+    exit_code="$?"
 
     if [ "$exit_code" -ne 0 ]; then
         odtp::print_error \

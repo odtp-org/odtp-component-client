@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-import yaml
 import os
 import re
 import sys
-import logging
 
 
 def __readTemplate(templatefile):
