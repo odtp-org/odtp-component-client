@@ -62,7 +62,7 @@ def main():
                 "logstring": "\n".join(log_page)                
             }
             print(f"add log_page_entry to db: {log_page_entry}")
-            _ = dbManager.add_logs(log_page_entry)
+            _ = dbManager.add_log_page(log_page_entry)
             print("empty log_page")
             log_page = []
 
@@ -70,17 +70,8 @@ def main():
 
         # TODO: Improve this
         if log == LOG_END_STRING:
-            print("ending was detected")
-            print(f"length log_page >= 10: {len(log_page)}")
-            log_page_entry = {
-                "stepRef": step_id,
-                "timestamp": datetime.now(timezone.utc),
-                "logstring": "\n".join(log_page)                
-            }
-            print(f"add log_page_entry to db: {log_page_entry}")
-            _ = dbManager.add_logs(log_page_entry)
-            print("empty log_page")
-            log_page = []            
+            print("ending was detected: add last log page to db")
+            _ = dbManager.add_log_page(log_page)          
             ending_detected = True
             break
 
