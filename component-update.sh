@@ -71,7 +71,8 @@ csv_file="components.csv"
     # Skip the header line
     read header
     while IFS=, read -r COMPONENT TAG; do
+        echo "Read line: COMPONENT=$COMPONENT, TAG=$TAG"  # Debugging output
         # Call the function with COMPONENT and TAG
         update_client "$COMPONENT" "$TAG"
-    done
+    done   
 } < "$csv_file"
