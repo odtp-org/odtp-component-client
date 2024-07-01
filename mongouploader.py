@@ -23,16 +23,13 @@ class MongoManager(object):
 
     def add_log_page(self, log_page):
         if not log_page:
-            print(f"log_page empty not entered into db:{log_page}")
             return
         log_page_entry = {
             "stepRef": self.step_id,
             "timestamp": datetime.now(timezone.utc),
             "logstring": "\n".join(log_page)                
-        }
-        print(f"add log_page_entry to db: {log_page_entry}")        
+        }       
         log_id = self.logs.insert_one(log_page_entry).inserted_id
-        print(f"successfull db entry {log_id}")
 
         return log_id       
 

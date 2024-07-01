@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from mongouploader import MongoManager
-from datetime import datetime, timezone
 import os
 import sys
 import time
@@ -10,6 +9,7 @@ import time
 DELAY = 0.2
 LOG_FILE_PATH = "/odtp/odtp-logs/log.txt"
 LOG_END_STRING = "--- ODTP COMPONENT ENDING ---"
+DEFAULT_PAGE_SIZE = 10
 
 class LogReader:
     def __init__(self, log_file):
@@ -33,7 +33,12 @@ class LogReader:
 
 
 def main():
-    step_id = os.getenv("ODTP_STEP_ID")
+    try:
+        page_size = os.getenv("ODTP_LOG_PAGE_SIZE")
+        page_size = int(page_size)
+    except Exception as e:
+        page_size = DEFAULT_PAGE_SIZE
+   
     try:
         dbManager = MongoManager()
     except Exception as e:
@@ -45,26 +50,19 @@ def main():
     # Active until it finds "--- ODTP COMPONENT ENDING ---"
     ending_detected = False
     while ending_detected == False:
-        print("-------- new loop")
         log_reading_batch = log_reader.read_from_last_position()
-        print(f"log_reading_batch: {log_reading_batch}")
 
         for log in log_reading_batch:
-            log_page.append(log)
-
-        print(f"log_page: {log_page}")    
+            log_page.append(log)   
 
         if len(log_page) >= 10:
-            print(f"length log_page >= 10: {len(log_page)}")
             _ = dbManager.add_log_page(log_page)
-            print("empty log_page")
             log_page = []
 
         time.sleep(DELAY)
 
         # TODO: Improve this
         if log == LOG_END_STRING:
-            print("ending was detected: add last log page to db")
             _ = dbManager.add_log_page(log_page)          
             ending_detected = True
             break
