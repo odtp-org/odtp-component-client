@@ -2,6 +2,27 @@
 
 Client for ODTP Components. This repository is aimed to be used as a submodule in the different components repositories. 
 
+## Update of Components
+
+There is a script to facilitate the update of components when the `odtp-component-client` is changed: 
+
+- Enter in the list `component.csv` the component name and the tag. See current examples there
+- Run the tool `scripts/component-update.sh`: you need to set some parameters in the script before you run it.
+
+The parameters are: 
+
+```
+GIT_PATH=/<full path to a repo where you have your components on your local computer>
+GIT_ORG=<git organisation: for example odtp-org>
+BRANCH=<current branch on the client that you are working on>
+```
+
+When you have an entry such as `odtp-component-example,v0.1.3-alpha-22` in your csv file, the script 
+will do the following:
+
+Update the `odtp-component-client` in your git repo `odtp-org/odtp-component-example` and tag the commit 
+in the component repo with `v0.1.3-alpha-22` so that you can use the tag to run the component in `odtp`.
+
 ## Changelog
 
 - v0.1.2
