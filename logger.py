@@ -45,26 +45,42 @@ def main():
     # Active until it finds "--- ODTP COMPONENT ENDING ---"
     ending_detected = False
     while ending_detected == False:
-        logs = log_reader.read_from_last_position()
-        
-        newLogList = []
+        print("-------- new loop")
+        log_reading_batch = log_reader.read_from_last_position()
+        print(f"log_reading_batch: {log_reading_batch}")
 
-        for log in logs:
+        for log in log_reading_batch:
             log_page.append(log)
 
+        print(f"log_page: {log_page}")    
+
         if len(log_page) >= 10:
+            print(f"length log_page >= 10: {len(log_page)}")
             log_page_entry = {
                 "stepRef": step_id,
                 "timestamp": datetime.now(timezone.utc),
                 "logstring": "\n".join(log_page)                
             }
+            print(f"add log_page_entry to db: {log_page_entry}")
             _ = dbManager.add_logs(log_page_entry)
+            print("empty log_page")
             log_page = []
 
         time.sleep(DELAY)
 
         # TODO: Improve this
         if log == LOG_END_STRING:
+            print("ending was detected")
+            print(f"length log_page >= 10: {len(log_page)}")
+            log_page_entry = {
+                "stepRef": step_id,
+                "timestamp": datetime.now(timezone.utc),
+                "logstring": "\n".join(log_page)                
+            }
+            print(f"add log_page_entry to db: {log_page_entry}")
+            _ = dbManager.add_logs(log_page_entry)
+            print("empty log_page")
+            log_page = []            
             ending_detected = True
             break
 
