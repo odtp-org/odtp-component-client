@@ -6,7 +6,8 @@ Client for ODTP Components. This repository is aimed to be used as a submodule i
 
 There is a script to facilitate the update of components when the `odtp-component-client` is changed: 
 
-- Enter in the list `component.csv` the component name and the tag. See current examples there
+- Copy `cp component.dist.csv component.csv`
+- Overwrite in `component.csv` the content lines with your component names and tags.
 - Run the tool `scripts/component-update.sh`: you need to set some parameters in the script before you run it.
 
 The parameters are: 
