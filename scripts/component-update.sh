@@ -3,7 +3,7 @@
 # GIT_PATH should be an empty directory
 GIT_PATH=/Users/smaennel/odtp/git
 GIT_ORG=odtp-org
-BRANCH=chore/cleanup-logger
+BRANCH=chore/main
 
 # Function to update COMPONENT for TAG
 update_client() {
