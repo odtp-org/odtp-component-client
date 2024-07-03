@@ -154,22 +154,6 @@ function upload_snapshot () {
 
 }
 
-function move_logs_to_output () {
-
-    odtp::print_info "Copying the logs to the output directory"
-    cp /odtp/odtp-logs/log.txt /odtp/odtp-output/log.txt
-
-    exit_code="$?"
-
-    if [ "$exit_code" -ne 0 ]; then
-        odtp::print_error \
-            "copying log files to output failed with '$exit_code'."
-    fi
-
-    return 0
-
-}
-
 function main() {
     odtp::print_info "Starting odtp component."
 
@@ -193,7 +177,6 @@ function main() {
     compress_output
     compress_workdir
     upload_snapshot
-    move_logs_to_output
 }
 
 main "$@"
