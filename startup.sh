@@ -13,6 +13,16 @@ touch /odtp/odtp-logs/odtpLoggerDebugging.txt
 touch /odtp/odtp-logs/odtpS3UploadedDebugging.txt
 
 odtp::print_info "starting the odtp client app"
+
+if [ "${ODTP_API_MODE:-FALSE}" == "TRUE" ]; then
+    odtp::print_info "ODTP_API_MODE is TRUE, executing API mode specific commands"
+    
+    bash /odtp/odtp-app/api_mode.sh 
+else
+    odtp::print_info "ODTP_API_MODE is FALSE, executing ephemeral/interactive component"
+    bash /odtp/odtp-component-client/odtp-app.sh 2>&1 | tee /odtp/odtp-logs/log.txt
+fi
+
 bash /odtp/odtp-component-client/odtp-app.sh 2>&1 | tee /odtp/odtp-logs/log.txt
 
 # this comment is needed by the python logger to catch the end of the log
